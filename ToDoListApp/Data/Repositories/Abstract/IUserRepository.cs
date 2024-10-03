@@ -5,5 +5,7 @@ namespace ToDoListApp.Data.Repositories.Abstract
 {
     public interface IUserRepository:IGenericRepository<User>
     {
+        Task<User> GetUserByUsernameAsync(string username);
+
     }
 }

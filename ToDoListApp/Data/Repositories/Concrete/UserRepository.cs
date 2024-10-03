@@ -1,4 +1,5 @@
-﻿using ToDoListApp.Data.Repositories.Abstract;
+﻿using Microsoft.EntityFrameworkCore;
+using ToDoListApp.Data.Repositories.Abstract;
 using ToDoListApp.Models;
 
 namespace ToDoListApp.Data.Repositories.Concrete
@@ -9,6 +10,10 @@ namespace ToDoListApp.Data.Repositories.Concrete
         public UserRepository(ToDoAppContext context):base(context)
         {
             _context = context;
+        }
+        public async Task<User> GetUserByUsernameAsync(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
         }
     }
 }
