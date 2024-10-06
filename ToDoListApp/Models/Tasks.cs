@@ -2,7 +2,7 @@
 {
     public enum TaskState
     {
-        Task,
+        Created,
         InProgress,
         Completed
     }
@@ -11,7 +11,7 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public TaskState State { get; set; } = TaskState.Task;
+        public TaskState State { get; set; } = TaskState.Created;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public int? UserId { get; set; }

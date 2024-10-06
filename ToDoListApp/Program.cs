@@ -11,18 +11,25 @@ using ToDoListApp.Services.Abstract;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
-    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
-    options.JsonSerializerOptions.MaxDepth = 32; // Gerekirse ayarlayın
+    options.JsonSerializerOptions.MaxDepth = 32; 
 });
 
-// IConfiguration'ı ekliyoruz
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.AllowAnyOrigin() 
+                   .AllowAnyMethod() 
+                   .AllowAnyHeader(); 
+        });
+});
+
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-// JWT Authentication ayarları
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -40,6 +47,9 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"]
     };
 });
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 
 builder.Services.AddDbContext<ToDoAppContext>(options=> options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -62,6 +72,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("AllowAllOrigins");
+
 
 app.UseHttpsRedirection();
 

@@ -3,50 +3,83 @@ using System.Threading.Tasks;
 using static ToDoListApp.Data.Repositories.Abstract.IGenericRepository;
 using ToDoListApp.Models;
 using ToDoListApp.Data.Repositories.Abstract;
+using ToDoListApp.DTOs;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using AutoMapper;
 
 public class TasksService : ITasksService
 {
     private readonly ITasksRepository _taskRepository;
     private readonly IUserRepository _userRepository;
-
-    public TasksService(ITasksRepository taskRepository , IUserRepository userRepository)
+    private readonly IMapper _mapper;
+    public TasksService(ITasksRepository taskRepository , IUserRepository userRepository,IMapper mapper)
     {
         _taskRepository = taskRepository;
         _userRepository = userRepository;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<Tasks>> GetAllTasksAsync()
+    public async Task<IEnumerable<TaskDto>> GetAllTasksAsync()
     {
-        return await _taskRepository.GetAllAsync();
+       var tasks=  await _taskRepository.GetAllAsync();
+       return _mapper.Map<IEnumerable<TaskDto>>(tasks);
     }
 
-    public async Task<Tasks> GetTaskByIdAsync(int id)
+    public async Task<TaskDto> GetTaskByIdAsync(int id)
     {
-        return await _taskRepository.GetByIdAsync(id);
+        var  task = await _taskRepository.GetByIdAsync(id);
+        return _mapper.Map<TaskDto>(task);
     }
-    public async Task<IEnumerable<Tasks>> GetTasksByUserIdAsync(int id)
+    public async Task<IEnumerable<TaskDto>> GetTasksByUserIdAsync(int id)
     {
-        return await _taskRepository.GetTasksByUserIdAsync(id);
+        
+        var tasks = await _taskRepository.GetTasksByUserIdAsync(id);
+        return _mapper.Map<IEnumerable<TaskDto>>(tasks);
     }
 
 
-    public async Task AddTaskAsync(Tasks task)
+    public async Task<TaskDto> AddTaskAsync(CreateTaskDto createTaskDto)
     {
+        var task = _mapper.Map<Tasks>(createTaskDto);
+        task.CreatedAt = DateTime.UtcNow;
         var user = await _userRepository.GetByIdAsync(task.UserId.Value);
         if(user != null)
         {
             user.Tasks.Add(task);
         } 
-        await _taskRepository.AddAsync(task);
+       
+        var addedTask =await _taskRepository.AddAsync(task);
+        return _mapper.Map<TaskDto>(addedTask);
     }
 
-    public async Task UpdateTaskAsync(Tasks task)
+    public async Task<TaskDto> UpdateTaskAsync(UpdateTaskDto updateTaskDto)
     {
-        await _taskRepository.UpdateAsync(task);
+        var task = _mapper.Map<Tasks>(updateTaskDto);
+
+        var existingTask = await _taskRepository.GetByIdAsync(task.Id);
+        if (existingTask == null)
+        {
+            throw new KeyNotFoundException("Task not found.");
+        }
+
+        existingTask.Name = updateTaskDto.Name ?? existingTask.Name;
+        existingTask.Description = updateTaskDto.Description ?? existingTask.Description;
+        
+        if (updateTaskDto.State.HasValue) 
+        {
+            existingTask.State = updateTaskDto.State.Value;
+        }
+
+        var updatedTask = await _taskRepository.UpdateAsync(existingTask);
+        return _mapper.Map<TaskDto>(updatedTask);
     }
 
     public async Task DeleteTaskAsync(int id)
     {
         await _taskRepository.DeleteAsync(id);
+    }
+    public async Task UpdateTaskStateAsync(int taskId, string newState)
+    {
+        await _taskRepository.UpdateTaskStateAsync(taskId, newState);
     }
 }

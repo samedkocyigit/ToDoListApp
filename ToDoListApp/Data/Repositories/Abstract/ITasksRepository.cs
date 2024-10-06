@@ -6,5 +6,7 @@ namespace ToDoListApp.Data.Repositories.Abstract
     public interface ITasksRepository:IGenericRepository<Tasks>
     {
         Task<IEnumerable<Tasks>> GetTasksByUserIdAsync(int id);
+        Task UpdateTaskStateAsync(int taskId, string newState);
+
     }
 }
