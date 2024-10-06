@@ -18,14 +18,14 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Register([FromBody] UserRegisterDto userRegisterDto)
     {
         var result = await _authService.Register(userRegisterDto);
-        return Ok(result); // UserDto olarak geri döner
+        return Ok(result); 
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] UserLoginDto userLoginDto)
     {
-        var token = await _authService.Login(userLoginDto);
-        return Ok(new { Token = token });
+        var user = await _authService.Login(userLoginDto);
+        return Ok(new { User = user });
     }
 
     [HttpPost("logout")]
