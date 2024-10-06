@@ -41,7 +41,7 @@ public class AuthService : IAuthService
         };
     }
 
-    public async Task<string> Login(UserLoginDto userLoginDto)
+    public async Task<LoginResponseDto> Login(UserLoginDto userLoginDto)
     {
         var user = await _userRepository.GetUserByUsernameAsync(userLoginDto.Username);
         if (user == null || !BCrypt.Net.BCrypt.Verify(userLoginDto.Password, user.Password))
@@ -63,12 +63,18 @@ public class AuthService : IAuthService
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        return tokenHandler.WriteToken(token);
+
+        return new LoginResponseDto
+        {
+            email = user.Email,
+            userId = user.Id,
+            token = tokenHandler.WriteToken(token),
+            name = user.Username
+        };
     }
 
     public Task Logout()
     {
-        // Logout işlemi frontend tarafından yönetilebilir
         return Task.CompletedTask;
     }
 }

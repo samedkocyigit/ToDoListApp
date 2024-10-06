@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ToDoListApp.DTOs;
 using ToDoListApp.Models;
 
 namespace ToDoListApp.Controllers
@@ -18,7 +19,7 @@ namespace ToDoListApp.Controllers
 
         // GET: api/user
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
             return Ok(users);
@@ -38,10 +39,10 @@ namespace ToDoListApp.Controllers
 
         // POST: api/user
         [HttpPost]
-        public async Task<ActionResult<User>> AddUser(User user)
+        public async Task<ActionResult<UserDto>> AddUser(UserRegisterDto user)
         {
-            await _userService.AddUserAsync(user);
-            return CreatedAtAction(nameof(GetUserById), new { id = user.Id }, user);
+            var newUser= await _userService.AddUserAsync(user);
+            return CreatedAtAction(nameof(GetUserById), new { id = newUser.Id }, newUser);
         }
 
         // PUT: api/user/{id}

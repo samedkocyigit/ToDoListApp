@@ -18,5 +18,28 @@ namespace ToDoListApp.Data.Repositories.Concrete
                            .Where(t => t.UserId == userId)
                            .ToListAsync();
         }
+        public async Task UpdateTaskStateAsync(int taskId,string state)
+        {
+            var task = await _context.Tasks.FindAsync(taskId);
+            if (task != null)
+            {
+                if (state == "InProgress")
+                {
+                    task.State = TaskState.InProgress;
+                }
+                else if (state == "Task")
+                {
+                    task.State = TaskState.Created;
+                }
+                else if (state == "Completed")
+                {
+                    task.State = TaskState.Completed;
+                }
+                else
+                {
+                }
+               await _context.SaveChangesAsync();
+            }
+        }
     }
 }

@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Ocsp;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ToDoListApp.DTOs;
 using ToDoListApp.Models;
 
 namespace ToDoListApp.Controllers
@@ -21,7 +23,7 @@ namespace ToDoListApp.Controllers
 
         // GET: api/tasks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Tasks>>> GetAllTasks()
+        public async Task<ActionResult<IEnumerable<TaskDto>>> GetAllTasks()
         {
             var tasks = await _tasksService.GetAllTasksAsync();
             return Ok(tasks);
@@ -29,7 +31,7 @@ namespace ToDoListApp.Controllers
 
         // GET: api/tasks/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Tasks>> GetTaskById(int id)
+        public async Task<ActionResult<TaskDto>> GetTaskById(int id)
         {
             var task = await _tasksService.GetTaskByIdAsync(id);
             if (task == null)
@@ -41,35 +43,35 @@ namespace ToDoListApp.Controllers
 
         // POST: api/tasks
         [HttpPost]
-        public async Task<ActionResult<Tasks>> AddTask(Tasks task)
+        public async Task<ActionResult<TaskDto>> AddTask(CreateTaskDto createTaskDto)
         {
-            if(task == null || task.UserId<=0)
+            if (createTaskDto == null || createTaskDto.UserId <= 0)
             {
                 return BadRequest("Task or UserId Cannot be Null");
             }
 
-            ////var user= await _userService.GetUserByIdAsync(task.UserId);
-            //if (user == null)
-            //{
-            //    return NotFound("User not Found");
-            //}
-
-            //task.User = user;
-            await _tasksService.AddTaskAsync(task);
-            return CreatedAtAction(nameof(GetTaskById), new { id = task.Id }, task);
-        }
-
-        // PUT: api/tasks/{id}
+            var taskDto = await _tasksService.AddTaskAsync(createTaskDto);
+            return CreatedAtAction(nameof(GetTaskById), new { id = taskDto.Id }, taskDto);
+        }        
+        
+        //// PUT: api/tasks/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTask(int id, Tasks task)
+        public async Task<ActionResult<TaskDto>> UpdateTask(int id, UpdateTaskDto updateTaskDto)
         {
-            if (id != task.Id)
+            var oldTask = await _tasksService.GetTaskByIdAsync(id);
+            if (oldTask == null)
             {
                 return BadRequest();
             }
-            await _tasksService.UpdateTaskAsync(task);
-            return NoContent();
+            if (id != updateTaskDto.Id)
+            {
+                return BadRequest();
+            }
+            var updatedTask =await _tasksService.UpdateTaskAsync(updateTaskDto);
+            return Ok(updatedTask);
         }
+
+
 
         // DELETE: api/tasks/{id}
         [HttpDelete("{id}")]
@@ -85,6 +87,21 @@ namespace ToDoListApp.Controllers
             var tasks = await _tasksService.GetTasksByUserIdAsync(userId);
 
             return Ok(tasks); // Bulunan görevleri döner
+        }
+
+        
+        [HttpPut("{taskId}/{state}")]
+        public async Task<IActionResult> UpdateTaskState(int taskId, string state)
+        {
+            try
+            {
+                await _tasksService.UpdateTaskStateAsync(taskId, state);
+                return Ok("Task state updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("amına koycam ya");
+            }
         }
     }
 }
