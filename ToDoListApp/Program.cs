@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ToDoListApp.Data;
-using static ToDoListApp.Data.Repositories.Abstract.IGenericRepository;
-using ToDoListApp.Data.Repositories.Concrete;
-using ToDoListApp.Data.Repositories.Abstract;
+using static ToDoListApp.Infrastructure.Repositories.GenericRepository.IGenericRepository;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using ToDoListApp.Services.Abstract;
+using ToDoListApp.Domain.Services.AuthService;
+using ToDoListApp.Infrastructure.Repositories.GenericRepository;
+using ToDoListApp.Infrastructure.Repositories.TasksRepository;
+using ToDoListApp.Infrastructure.Repositories.UserRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>(); // Custom error handling middleware
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
