@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ToDoListApp.DTOs;
-using ToDoListApp.Services.Abstract;
+using ToDoListApp.Domain.Models.DTOs;
+using ToDoListApp.Domain.Services.AuthService;
 
 [Route("api/[controller]")]
 [ApiController]

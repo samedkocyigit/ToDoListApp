@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using ToDoListApp.DTOs;
-using ToDoListApp.Models;
+using ToDoListApp.Domain.Models.DTOs;
+using ToDoListApp.Domain.Models.Models;
 
 namespace ToDoListApp.Controllers
 {
@@ -27,13 +27,9 @@ namespace ToDoListApp.Controllers
 
         // GET: api/user/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUserById(int id)
+        public async Task<ActionResult<UserDto>> GetUserById(int id)
         {
             var user = await _userService.GetUserByIdAsync(id);
-            if (user == null)
-            {
-                return NotFound();
-            }
             return Ok(user);
         }
 
@@ -49,10 +45,6 @@ namespace ToDoListApp.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, User user)
         {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
             await _userService.UpdateUserAsync(user);
             return NoContent();
         }
