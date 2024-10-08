@@ -9,7 +9,9 @@ public class MappingProfile : Profile
         CreateMap<User, UserDto>();
         CreateMap<UserRegisterDto, User>()
             .ForMember(dest => dest.Password, opt => opt.Ignore());
-        CreateMap<CreateTaskDto, Tasks>();  
+        CreateMap<CreateTaskDto, Tasks>(); 
         CreateMap<Tasks, TaskDto>();    
+        CreateMap<UpdateTaskDto, Tasks>();
+        CreateMap<Task, UpdateTaskDto>();
     }
 }

@@ -10,6 +10,4 @@ public interface ITasksService
     Task<TaskDto> AddTaskAsync(CreateTaskDto task);
     Task<TaskDto> UpdateTaskAsync(UpdateTaskDto task);
     Task DeleteTaskAsync(int id);
-    Task UpdateTaskStateAsync(int taskId, string newState);
-
 }

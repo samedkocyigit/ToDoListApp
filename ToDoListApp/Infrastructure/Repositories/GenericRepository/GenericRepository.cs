@@ -40,7 +40,8 @@ namespace ToDoListApp.Infrastructure.Repositories.GenericRepository
 
         public async Task<T> UpdateAsync(T entity)
         {
-            var result = _dbSet.Update(entity);
+            _dbSet.Attach(entity);
+            var result =_context.Entry(entity).State = EntityState.Modified;
             if (result == null)
                 throw new ErrorExceptions("Update process has been failed");
             await _context.SaveChangesAsync();
