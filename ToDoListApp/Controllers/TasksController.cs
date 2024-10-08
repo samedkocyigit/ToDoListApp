@@ -70,7 +70,7 @@ namespace ToDoListApp.Controllers
         {
             var tasks = await _tasksService.GetTasksByUserIdAsync(userId);
 
-            return Ok(tasks); // Bulunan görevleri döner
+            return Ok(tasks); 
         }
     }
 }
