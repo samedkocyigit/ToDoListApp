@@ -55,18 +55,18 @@ public class TasksService : ITasksService
 
     public async Task<TaskDto> UpdateTaskAsync(UpdateTaskDto updateTaskDto)
     {
-        var task = _mapper.Map<Tasks>(updateTaskDto);
+        var existingTask = await _taskRepository.GetByIdAsync(updateTaskDto.Id);
 
-        var updatedTask = await _taskRepository.UpdateAsync(task);
-        return _mapper.Map<TaskDto>(updatedTask);
+        _mapper.Map(updateTaskDto, existingTask);
+
+        await _taskRepository.UpdateAsync(existingTask);
+
+        return _mapper.Map<TaskDto>(existingTask);
     }
+
 
     public async Task DeleteTaskAsync(int id)
     {
         await _taskRepository.DeleteAsync(id);
-    }
-    public async Task UpdateTaskStateAsync(int taskId, string newState)
-    {
-        await _taskRepository.UpdateTaskStateAsync(taskId, newState);
     }
 }

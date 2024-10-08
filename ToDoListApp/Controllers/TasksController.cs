@@ -49,7 +49,7 @@ namespace ToDoListApp.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<TaskDto>> UpdateTask(int id, UpdateTaskDto updateTaskDto)
         {
-            var oldTask = await _tasksService.GetTaskByIdAsync(id);
+            await _tasksService.GetTaskByIdAsync(id);
             var updatedTask =await _tasksService.UpdateTaskAsync(updateTaskDto);
             return Ok(updatedTask);
         }
@@ -71,14 +71,6 @@ namespace ToDoListApp.Controllers
             var tasks = await _tasksService.GetTasksByUserIdAsync(userId);
 
             return Ok(tasks); // Bulunan görevleri döner
-        }
-
-        
-        [HttpPut("{taskId}/{state}")]
-        public async Task<IActionResult> UpdateTaskState(int taskId, string state)
-        {
-            await _tasksService.UpdateTaskStateAsync(taskId, state);
-            return Ok("Task state updated successfully.");
         }
     }
 }
